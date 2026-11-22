@@ -25,3 +25,8 @@ Actual on Linux:
 configurable attribute "actual" in @@rules_python++pip+python_deps//appnope:_no_matching_repository
 doesn't match this configuration: No matching wheel for current configuration's Python version and platform.
 ```
+
+## Regression check
+
+Changing `bazel_dep(name = "rules_python", version = ...)` in `MODULE.bazel` to `2.4.6` makes both commands above succeed.
+So the failure is introduced between 2.4.6 and 2.5.1, consistent with the uv.lock edge-marker handling added in 2.5.0.
