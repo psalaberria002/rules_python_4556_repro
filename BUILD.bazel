@@ -1,0 +1,7 @@
+load("@python_deps//:requirements.bzl", "all_whl_requirements")
+
+# Stand-in for consumers of the flat list, e.g. gazelle's modules_mapping.
+filegroup(
+    name = "all_whls",
+    srcs = all_whl_requirements,
+)
