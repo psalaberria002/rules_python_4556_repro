@@ -5,3 +5,9 @@ filegroup(
     name = "all_whls",
     srcs = all_whl_requirements,
 )
+
+# Workaround: drop the macOS-only package so analysis succeeds on Linux.
+filegroup(
+    name = "all_whls_linux",
+    srcs = [w for w in all_whl_requirements if "//appnope:" not in w],
+)
