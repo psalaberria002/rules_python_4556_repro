@@ -15,3 +15,5 @@ pip.parse(
 use_repo(pip, "python_deps")
 
 bazel_dep(name = "platforms", version = "1.0.0")
+
+bazel_dep(name = "rules_python_gazelle_plugin", version = "2.5.1")

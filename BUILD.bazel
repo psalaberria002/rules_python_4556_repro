@@ -1,13 +1,14 @@
 load("@python_deps//:requirements.bzl", "all_whl_requirements")
+load("@rules_python_gazelle_plugin//modules_mapping:def.bzl", "modules_mapping")
 
-# Stand-in for consumers of the flat list, e.g. gazelle's modules_mapping.
-filegroup(
-    name = "all_whls",
-    srcs = all_whl_requirements,
+# What gazelle's python extension uses to map imports to pip packages.
+modules_mapping(
+    name = "modules_map",
+    wheels = all_whl_requirements,
 )
 
-# Workaround: drop the macOS-only package so analysis succeeds on Linux.
-filegroup(
-    name = "all_whls_linux",
-    srcs = [w for w in all_whl_requirements if "//appnope:" not in w],
+# Same thing with the macOS-only package filtered out by hand.
+modules_mapping(
+    name = "modules_map_workaround",
+    wheels = [w for w in all_whl_requirements if "//appnope:" not in w],
 )
