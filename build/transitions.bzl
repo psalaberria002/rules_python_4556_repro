@@ -1,0 +1,27 @@
+"""Builds a target for a fixed list of platforms, regardless of the host."""
+
+def _multiarch_transition(_settings, attr):
+    return [
+        {"//command_line_option:platforms": str(platform)}
+        for platform in attr.platforms
+    ]
+
+multiarch_transition = transition(
+    implementation = _multiarch_transition,
+    inputs = [],
+    outputs = ["//command_line_option:platforms"],
+)
+
+def _impl(ctx):
+    return DefaultInfo(files = depset(ctx.files.target))
+
+multi_arch = rule(
+    implementation = _impl,
+    attrs = {
+        "target": attr.label(cfg = multiarch_transition),
+        "platforms": attr.label_list(),
+        "_allowlist_function_transition": attr.label(
+            default = "@bazel_tools//tools/allowlists/function_transition_allowlist",
+        ),
+    },
+)

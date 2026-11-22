@@ -1,14 +1,56 @@
+load("@bazel_gazelle//:def.bzl", "gazelle", "gazelle_binary")
 load("@python_deps//:requirements.bzl", "all_whl_requirements")
+load("@rules_python_gazelle_plugin//manifest:defs.bzl", "gazelle_python_manifest")
 load("@rules_python_gazelle_plugin//modules_mapping:def.bzl", "modules_mapping")
+load("//build:transitions.bzl", "multi_arch")
 
-# What gazelle's python extension uses to map imports to pip packages.
+package(default_visibility = ["//visibility:public"])
+
+# gazelle:python_root
+
+gazelle_binary(
+    name = "gazelle_bin",
+    languages = ["@rules_python_gazelle_plugin//python"],
+)
+
+gazelle(
+    name = "gazelle",
+    gazelle = ":gazelle_bin",
+)
+
+# Maps python imports to pip packages. Fails on Linux because of `appnope`.
 modules_mapping(
     name = "modules_map",
     wheels = all_whl_requirements,
 )
 
-# Same thing with the macOS-only package filtered out by hand.
+# Always evaluate the mapping for Linux so gazelle_python.yaml is identical on every host.
+multi_arch(
+    name = "modules_map_linux",
+    platforms = ["//platforms:linux_x86_64"],
+    target = ":modules_map",
+)
+
+gazelle_python_manifest(
+    name = "gazelle_python",
+    modules_mapping = ":modules_map_linux",
+    pip_repository_name = "python_deps",
+)
+
+# Workaround: same thing with the macOS-only package filtered out by hand.
 modules_mapping(
     name = "modules_map_workaround",
     wheels = [w for w in all_whl_requirements if "//appnope:" not in w],
+)
+
+multi_arch(
+    name = "modules_map_workaround_linux",
+    platforms = ["//platforms:linux_x86_64"],
+    target = ":modules_map_workaround",
+)
+
+gazelle_python_manifest(
+    name = "gazelle_python_workaround",
+    modules_mapping = ":modules_map_workaround_linux",
+    pip_repository_name = "python_deps",
 )

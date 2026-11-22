@@ -1,0 +1,4 @@
+manifest:
+  modules_mapping: {}
+  pip_repository:
+    name: python_deps
